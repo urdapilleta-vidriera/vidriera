@@ -50,5 +50,21 @@ onValue(ref(db, 'vidriera/videoConfig'), (snap) => {
   }
 });
 </script>
+<script>
+// Auto-recargar cada 2 horas para mantener videos activos
+setInterval(() => { location.reload(); }, 2 * 60 * 60 * 1000);
+
+// Si la pagina lleva mas de 10 segundos sin cambios visibles, verificar conexion
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    // Recargar si la pagina estuvo oculta mas de 1 hora
+    if (window._lastVisible && Date.now() - window._lastVisible > 60 * 60 * 1000) {
+      location.reload();
+    }
+  } else {
+    window._lastVisible = Date.now();
+  }
+});
+</script>
 </body>
 </html>
