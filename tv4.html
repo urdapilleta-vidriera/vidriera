@@ -254,7 +254,7 @@ onValue(ref(db, 'vidriera'), (snap) => {
   if (data.propiedades) propiedadesData = data.propiedades;
   if (data.tvConfig) tvConfigData = data.tvConfig;
   
-  const defaultModo = TV_ID === 'tv2' ? 'venta' : TV_ID === 'tv3' ? 'renta' : 'logo';
+  const defaultModo = 'logo'; // Default to logo when Firebase has no config
   const cfg = (tvConfigData && tvConfigData[TV_ID]) ? tvConfigData[TV_ID] : { modo: defaultModo, video: '' };
   const modo = cfg.modo || defaultModo;
   const video = cfg.video || '';
