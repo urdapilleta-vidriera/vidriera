@@ -1071,6 +1071,7 @@ function guardarTV(tv) {
   if (tv === 'tv4') videoConfig.url = tvConfig.tv4.video;
   toast('✓ Pantalla ' + tv.replace('tv','') + ' actualizada');
   if(window.syncFirebase) window.syncFirebase();
+  refreshPantallasIfOpen();
 }
 
 function guardarVideo() {} // kept for compatibility
@@ -1377,6 +1378,20 @@ onValue(dbRef, (snapshot) => {
     if (data.videoConfig.url) videoConfig.url = data.videoConfig.url;
     if (data.videoConfig.tv1) videoConfig.tv1 = data.videoConfig.tv1;
   }
+  if (data.tvConfig) {
+    tvConfig = data.tvConfig;
+    ['tv1','tv2','tv3','tv4'].forEach(tv => {
+      const modoEl = document.getElementById('modo-' + tv);
+      const videoEl = document.getElementById('video-' + tv);
+      if (modoEl && tvConfig[tv]) {
+        modoEl.value = tvConfig[tv].modo || 'logo';
+        toggleVideoField(tv);
+      }
+      if (videoEl && tvConfig[tv] && tvConfig[tv].video) {
+        videoEl.value = tvConfig[tv].video;
+      }
+    });
+  }
   const pantallasTab = document.getElementById('tab-pantallas');
   if (pantallasTab && pantallasTab.classList.contains('active')) {
     Object.values(tvPlayers).forEach(p => clearTimeout(p.timer));
@@ -1384,6 +1399,16 @@ onValue(dbRef, (snapshot) => {
     renderPantallas();
   }
 });
+
+// Also re-render pantallas when tvConfig changes
+function refreshPantallasIfOpen() {
+  const pantallasTab = document.getElementById('tab-pantallas');
+  if (pantallasTab && pantallasTab.classList.contains('active')) {
+    Object.values(tvPlayers).forEach(p => clearTimeout(p.timer));
+    tvPlayers = {};
+    renderPantallas();
+  }
+}
 
 window._syncOnSave = true;
 
