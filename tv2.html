@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Urdapilleta RE — En Venta</title>
+<title>Urdapilleta RE — 2</title>
 <link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   @font-face {
@@ -51,20 +51,20 @@
   .tv-empty img { width: 40%; max-width: 350px; }
   .tv-empty-txt { font-size: 0.9rem; color: #aab0c4; }
 </style>
+<style>
+  .logo-screen { width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#fff; }
+  .logo-screen img { width:60%;max-width:500px; }
+  .full-iframe { position:fixed;inset:0;width:100%;height:100%;border:none; }
+</style>
 </head>
 <body>
-<div class="tv-screen" id="tv-screen">
-  <div class="tv-strip"></div>
-  <div class="tv-progress" id="tv-progress"></div>
-</div>
+<div id="app" style="width:100vw;height:100vh;overflow:hidden;background:#000"></div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const LOGO_SRC = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIGlkPSJDYXBhXzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDEwODAgMzI5Ljk5Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6IzM5NWI5ODtzdHJva2Utd2lkdGg6MHB4O308L3N0eWxlPjwvZGVmcz48ZyBpZD0iQ2FwYV8xLTIiPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTQ0LjYsMTExLjg5YzExLjU3LDAsMjAuODEtMy44NiwyNy43My0xMS41OSw2LjkyLTcuNzMsMTAuMzgtMTcuMzgsMTAuMzgtMjguOTVWMGg0Ljg2djcxLjM1YzAsMTMuMy0zLjkyLDI0LjE5LTExLjc2LDMyLjY4LTcuODQsOC40OS0xOC4yNCwxMi43My0zMS4yMiwxMi43My0xMy42MiwwLTI0LjQ2LTQuMjItMzIuNTEtMTIuNjVDNC4wMyw5NS42OCwwLDg0Ljc2LDAsNzEuMzVWMGg4LjExdjcxLjM1YzAsMTEuNjgsMy4yNywyMS4zNSw5LjgxLDI5LjAzLDYuNTQsNy42OCwxNS40MywxMS41MSwyNi42OCwxMS41MVoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im0xNzcuNTcsNjcuM3YtLjgxYzcuODktMS44NCwxNC4xOS01LjY1LDE4Ljg5LTExLjQzLDQuNy01Ljc4LDcuMDUtMTIuNzgsNy4wNS0yMSwwLTEwLjgxLTQuMDUtMTkuMTktMTIuMTYtMjUuMTQtOC4xMS01Ljk0LTE3Ljg0LTguOTItMjkuMTktOC45MmgtMzguOTJ2MTEzLjUxaDguMTFWNC44NmgzMC44MWM2LjcsMCwxMi43MywxLjQ5LDE4LjA4LDQuNDYsNS4zNSwyLjk3LDkuMzgsNy4zOCwxMi4wOCwxMy4yMiwxLjUxLDMuNjgsMi4yNyw3LjUxLDIuMjcsMTEuNTEsMCw4Ljc2LTMuMTYsMTUuODEtOS40OSwyMS4xNi01LjE1LDQuMzYtMTkuNyw3Ljc1LTE5LjcsNy43NWwzLjI0LDUuMTQsMzEuNjIsNDUuNDFoOS43M2wtMzIuNDMtNDYuMjJaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtMjMzLjUxLDBoMzBjMTcuNCwwLDMxLjg5LDUuMjIsNDMuNDYsMTUuNjUsMTEuNTcsMTAuNDMsMTcuMzUsMjQuMTQsMTcuMzUsNDEuMTFzLTUuODQsMzAuOTUtMTcuNTEsNDEuMjdjLTExLjY4LDEwLjMzLTI2LjExLDE1LjQ5LTQzLjMsMTUuNDloLTMwVjBabTMwLDQuODZoLTIxLjg5djEwMy43OGgyMS44OWMxNS4xMywwLDI3LjU3LTQuOTIsMzcuMy0xNC43Niw5LjczLTkuODQsMTQuNTktMjIuMjIsMTQuNTktMzcuMTRzLTQuOTItMjcuNTctMTQuNzYtMzcuM2MtOS44NC05LjczLTIyLjIyLTE0LjU5LTM3LjE0LTE0LjU5WiIvPjxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSIzOTMuMjQgMCAzODYuNzYgMCAzMzguMTEgMTEzLjUxIDM0NC41OSAxMTMuNTEgMzg3LjU3IDEwLjU0IDM4OC4zOCAxMC41NCA0MzIuMTYgMTEzLjUxIDQ0MS4wOCAxMTMuNTEgMzkzLjI0IDAiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im01MzQsOS41N2MtOC4zMy02LjM4LTE4LjIyLTkuNTctMjkuNjgtOS41N2gtNDAuNTR2NC44Nmg0MC41NGM5LjE5LDAsMTcuMDMsMi44NywyMy41MSw4LjU5LDYuNDksNS43Myw5LjczLDEzLjE0LDkuNzMsMjIuMjJzLTMuMTksMTYuNjItOS41NywyMi4zYy02LjM4LDUuNjgtMTQuMjcsOC41MS0yMy42OCw4LjUxaC00MC41NHY0Ny4wM2g4LjExdi00Mi4xNmgzMi40M2MxMS4zNSwwLDIxLjIyLTMuMTYsMjkuNTktOS40OSw4LjM4LTYuMzIsMTIuNTctMTUuMDUsMTIuNTctMjYuMTlzLTQuMTYtMTkuNzMtMTIuNDktMjYuMTFaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtNTc5LjczLDB2MTEzLjUxaC04LjExVjBoOC4xMVoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im02MjMuNTEsMHYxMDguNjVoNjYuNDlsLTEuNjIsNC44NmgtNzIuOTdWMGg4LjExWiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTcxOS4xOSwwdjEwOC42NWg2Ni40OWwtMS42Miw0Ljg2aC03Mi45N1YwaDguMTFaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtODE0Ljg2LDU3LjU3djUxLjA4aDY5LjczdjQuODZoLTc3Ljg0VjBoNzQuNmwtMS42Miw0Ljg2aC02NC44N3Y0Ny44NGg0OC42NWwtMS42Miw0Ljg2aC00Ny4wM1oiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im05MzIuNDMsMTEzLjUxVjQuODZoLTQxLjM1VjBoOTAuODFsLTEuNjIsNC44NmgtMzkuNzN2MTA4LjY1aC04LjExWiIvPjxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSIxMDMyLjE2IDAgMTAyNS42OCAwIDk3Ny4wMyAxMTMuNTEgOTgzLjUxIDExMy41MSAxMDI2LjQ5IDEwLjU0IDEwMjcuMyAxMC41NCAxMDcxLjA4IDExMy41MSAxMDgwIDExMy41MSAxMDMyLjE2IDAiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im00MTIuNzgsMjE2Ljg3aC05LjE4djEyLjA4aC0zLjU4di0zMS4zM2gxMC45N2MzLjM3LDAsNi4yMy44MSw4LjU3LDIuNDQsMi4zNCwxLjYzLDMuNTEsNC4wMiwzLjUxLDcuMTgsMCwyLjEyLS42LDMuOTQtMS44MSw1LjQ2LTEuMjEsMS41Mi0yLjg0LDIuNTQtNC45LDMuMDR2LjIybDguOTUsMTIuOThoLTQuMjVsLTguMjgtMTIuMDhabS05LjE4LTIuMjRoNy4zOGMyLjM5LDAsNC4zNi0uNjYsNS45My0xLjk3LDEuNTctMS4zMSwyLjM1LTMuMTIsMi4zNS01LjQycy0uNzktNC4xOC0yLjM3LTUuNDZjLTEuNTgtMS4yOC0zLjU1LTEuOTMtNS45MS0xLjkzaC03LjM4djE0Ljc3WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTQzNC40OSwyMTMuOTZ2MTIuNzZoMTguOHYyLjI0aC0yMi4zOHYtMzEuMzNoMjEuNzFsLS40NSwyLjI0aC0xNy42OHYxMS44NmgxMy4ybC0uNDUsMi4yNGgtMTIuNzZaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtNDgwLjgxLDIyOC45NWwtMy4zNi04LjA2aC0xNS44OWwtMy4zNiw4LjA2aC0yLjY5bDEzLjItMzEuMzNoMi45MWwxMy4yLDMxLjMzaC00LjAzWm0tMTEuNDEtMjYuODVsLTYuOTQsMTYuNTZoMTQuMWwtNi45NC0xNi41NmgtLjIyWiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTQ5My41NiwxOTcuNjJ2MjkuMDloMTcuOWwtLjQ1LDIuMjRoLTIxLjA0di0zMS4zM2gzLjU4WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTUzMC43MSwyMTMuOTZ2MTIuNzZoMTguOHYyLjI0aC0yMi4zOHYtMzEuMzNoMjEuNzFsLS40NSwyLjI0aC0xNy42OHYxMS44NmgxMy4ybC0uNDUsMi4yNGgtMTIuNzVaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtNTUzLjk5LDIwNS4wMWMwLTEuNzkuNi0zLjM1LDEuODEtNC42OCwxLjIxLTEuMzMsMi43Mi0yLjMxLDQuNTQtMi45MywxLjM0LS40NSwyLjg4LS42Nyw0LjYxLS42NywyLjE1LDAsNC4yLjUzLDYuMTUsMS41OSwxLjk1LDEuMDYsMy42MywyLjQ3LDUuMDQsNC4yM2wtMS4zNCwxLjEyYy0xLjI4LTEuNDktMi43OC0yLjY5LTQuNS0zLjU4LTEuNzItLjktMy41LTEuMzQtNS4zNS0xLjM0cy0zLjU4LjU4LTUuMDEsMS43NWMtMS40MywxLjE2LTIuMTUsMi42Ny0yLjE1LDQuNTIsMCwuNjMuMTQsMS4yLjQyLDEuNzIuMjguNTIuNy45OCwxLjI1LDEuMzkuNTUuNCwxLjA2LjczLDEuNTIuOTguNDYuMjUsMS4wMi41MSwxLjY4Ljc4LDEuMTYuNTQsMi42NywxLjEzLDQuNTIsMS43OSwxLjI4LjQ1LDIuMzkuOSwzLjMxLDEuMzQuOTMuNDUsMS44OSwxLjAzLDIuOTEsMS43NSwxLjAxLjcyLDEuOCwxLjU3LDIuMzUsMi41Ny41NSwxLC44MywyLjExLjgzLDMuMzQsMCwxLjk3LS42NSwzLjY4LTEuOTUsNS4xNS0xLjMsMS40Ni0yLjk1LDIuNTUtNC45NSwzLjI3LTEuNTIuNTEtMy4xOC43Ni00Ljk3Ljc2LTIuNTEsMC00LjkxLS42My03LjIxLTEuODgtMi4zLTEuMjUtNC4xNS0yLjk0LTUuNTUtNS4wNmwxLjM0LTEuMTJjMS4yOCwxLjg4LDIuOTQsMy4zNiw0Ljk3LDQuNDMsMi4wMywxLjA3LDQuMTgsMS42MSw2LjQ0LDEuNjFzNC4xOC0uNjUsNS43My0xLjk1YzEuNTUtMS4zLDIuMzMtMy4wMywyLjMzLTUuMjEsMC0uNjMtLjE0LTEuMi0uNDItMS43Mi0uMjktLjUyLS43LS45OS0xLjI1LTEuNDEtLjU1LS40Mi0xLjA1LS43NC0xLjUtLjk4LS40NS0uMjQtMS4wMS0uNTEtMS43LS44MS0xLjI4LS41NC0yLjc5LTEuMTItNC41Mi0xLjc1LTEuMjgtLjQ1LTIuMzktLjktMy4zMS0xLjM0LS45My0uNDUtMS45LTEuMDMtMi45MS0xLjc1LTEuMDEtLjcyLTEuOC0xLjU3LTIuMzUtMi41Ny0uNTUtMS0uODMtMi4xMS0uODMtMy4zNFoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im01OTAuMDIsMjI4Ljk1di0yOS4wOWgtMTAuOTd2LTIuMjRoMjUuNTFsLS40NSwyLjI0aC0xMC41MnYyOS4wOWgtMy41OFoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im02MjguMDYsMjI4Ljk1bC0zLjM2LTguMDZoLTE1Ljg5bC0zLjM2LDguMDZoLTIuNjlsMTMuMi0zMS4zM2gyLjkxbDEzLjIsMzEuMzNoLTQuMDNabS0xMS40MS0yNi44NWwtNi45NCwxNi41NmgxNC4xbC02Ljk0LTE2LjU2aC0uMjJaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtNjQxLjI2LDIyOC45NXYtMjkuMDloLTEwLjk3di0yLjI0aDI1LjUxbC0uNDUsMi4yNGgtMTAuNTJ2MjkuMDloLTMuNThaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtNjY0LjA5LDIxMy45NnYxMi43NmgxOC44djIuMjRoLTIyLjM4di0zMS4zM2gyMS43MWwtLjQ1LDIuMjRoLTE3LjY4djExLjg2aDEzLjJsLS40NSwyLjI0aC0xMi43NloiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im0zNTIuODgsMzExLjMxbC05LjE4LDE0LjYzaC0uNjJsLTkuMTktMTQuNjNoLS4xNnYxOC4wNmgtMS41NnYtMjEuOGgyLjM0bDkuMzQsMTQuOTRoLjE2bDkuMzQtMTQuOTRoMi4xOHYyMS44aC0yLjQ5di0xOC4wNmgtLjE2WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTM2My45MywzMDcuNTd2MjEuOGgtMi40OXYtMjEuOGgyLjQ5WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTM4NS4xLDMyOS4zN2wtMi4zNC01LjZoLTExLjA1bC0yLjM0LDUuNmgtMS44N2w5LjE5LTIxLjhoMi4wMmw5LjE5LDIxLjhoLTIuOFptLTcuOTQtMTguNjhsLTQuODIsMTEuNTJoOS44MWwtNC44Mi0xMS41MmgtLjE2WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTQxMi4xOSwzMTEuMzFsLTkuMTksMTQuNjNoLS42MmwtOS4xOC0xNC42M2gtLjE2djE4LjA2aC0xLjU2di0yMS44aDIuMzRsOS4zNCwxNC45NGguMTZsOS4zNC0xNC45NGgyLjE4djIxLjhoLTIuNDl2LTE4LjA2aC0uMTZaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtNDIzLjI1LDMwNy41N3YyMS44aC0yLjQ5di0yMS44aDIuNDlaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtNjA1Ljc3LDMxOS43MXY5LjY1aC0yLjQ5di0yMS44aDE0Ljk1bC0uMzEsMS41NmgtMTIuMTR2OS4wM2g5LjY1bC0uMzEsMS41NmgtOS4zNFoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im02MjMuOTgsMzA3LjU3djIwLjI0aDEyLjQ1bC0uMzEsMS41NmgtMTQuNjN2LTIxLjhoMi40OVoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im02MzcuODQsMzE4LjQ3YzAtMy4yMiwxLjA4LTUuOTQsMy4yMi04LjE3LDIuMTUtMi4yMyw0LjgxLTMuMzUsNy45OS0zLjM1czUuODksMS4xMiw4LjAyLDMuMzZjMi4xMywyLjI0LDMuMTksNC45NiwzLjE5LDguMTZzLTEuMDgsNS45Mi0zLjI0LDguMTYtNC44MiwzLjM2LTcuOTcsMy4zNi01Ljg0LTEuMTMtNy45OS0zLjM4Yy0yLjE1LTIuMjUtMy4yMi00Ljk3LTMuMjItOC4xNFptMTkuNzcsMGMwLTEuNy0uMzMtMy4zMi0xLTQuODQtLjY3LTEuNTMtMS42Ni0yLjc5LTIuOTktMy43OC0xLjMzLTEtMi44NS0xLjQ5LTQuNTgtMS40OS0yLjU3LDAtNC42NCwxLjAzLTYuMjEsMy4wOC0xLjU3LDIuMDUtMi4zNSw0LjQtMi4zNSw3LjA0LDAsMS45OS40NiwzLjg2LDEuMzgsNS42LjkyLDEuNzQsMi4yNCwzLDMuOTQsMy43NywxLjA0LjUsMi4xMi43NSwzLjI0Ljc1LDEuNzgsMCwzLjM4LS41Niw0Ljc5LTEuNjgsMS40MS0xLjEyLDIuNDQtMi41NSwzLjA4LTQuMy40Ni0xLjIyLjY4LTIuNi42OC00LjE0WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTY3My42NCwzMjAuOTZoLTYuMzh2OC40MWgtMi40OXYtMjEuOGg3LjYzYzIuMzUsMCw0LjMzLjU3LDUuOTYsMS43LDEuNjMsMS4xMywyLjQ0LDIuOCwyLjQ0LDUsMCwxLjQ3LS40MiwyLjc0LTEuMjYsMy44LS44NCwxLjA2LTEuOTgsMS43Ny0zLjQxLDIuMTJ2LjE2bDYuMjMsOS4wM2gtMi45NmwtNS43Ni04LjQxWm0tNi4zOC0xLjU2aDUuMTRjMS42NiwwLDMuMDMtLjQ2LDQuMTMtMS4zNywxLjA5LS45MSwxLjYzLTIuMTcsMS42My0zLjc3cy0uNTUtMi45MS0xLjY1LTMuOGMtMS4xLS44OS0yLjQ3LTEuMzQtNC4xMS0xLjM0aC01LjE0djEwLjI4WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTY4OC43NCwzMDcuNTd2MjEuOGgtMi40OXYtMjEuOGgyLjQ5WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTY5NC42NiwzMDcuNTdoNi4yM2MzLjMyLDAsNi4xMiwxLjAxLDguNDEsMy4wMywyLjI4LDIuMDIsMy40Miw0LjY0LDMuNDIsNy44NnMtMS4xNiw1Ljg5LTMuNDcsNy44OWMtMi4zMSwyLTUuMSwzLTguMzYsM2gtNi4yM3YtMjEuOFptNi4yMywxLjU2aC0zLjc0djE4LjY4aDMuNzRjMi43LDAsNC45LS44OSw2LjYyLTIuNjgsMS43MS0xLjc5LDIuNTctNC4wMSwyLjU3LTYuNjZzLS44Ni00Ljk1LTIuNTgtNi43MS0zLjkyLTIuNjMtNi42LTIuNjNaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtNzMyLjQ5LDMyOS4zN2wtMi4zNC01LjZoLTExLjA1bC0yLjM0LDUuNmgtMS44N2w5LjE5LTIxLjhoMi4wMmw5LjE5LDIxLjhoLTIuOFptLTcuOTQtMTguNjhsLTQuODIsMTEuNTJoOS44MWwtNC44Mi0xMS41MmgtLjE2WiIvPjxyZWN0IGNsYXNzPSJjbHMtMSIgeD0iNDc4LjI0IiB5PSIzMTkuODQiIHdpZHRoPSI3MC4wNSIgaGVpZ2h0PSIxLjQ2Ii8+PC9nPjwvc3ZnPg==';
-const TIPO = 'venta';
-const TIPO_NAME = 'PROPIEDADES EN VENTA';
-
+const LOGO_SRC = 'data:data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIGlkPSJDYXBhXzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDEwODAgMzI5Ljk5Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6IzM5NWI5ODtzdHJva2Utd2lkdGg6MHB4O308L3N0eWxlPjwvZGVmcz48ZyBpZD0iQ2FwYV8xLTIiPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTQ0LjYsMTExLjg5YzExLjU3LDAsMjAuODEtMy44NiwyNy43My0xMS41OSw2LjkyLTcuNzMsMTAuMzgtMTcuMzgsMTAuMzgtMjguOTVWMGg0Ljg2djcxLjM1YzAsMTMuMy0zLjkyLDI0LjE5LTExLjc2LDMyLjY4LTcuODQsOC40OS0xOC4yNCwxMi43My0zMS4yMiwxMi43My0xMy42MiwwLTI0LjQ2LTQuMjItMzIuNTEtMTIuNjVDNC4wMyw5NS42OCwwLDg0Ljc2LDAsNzEuMzVWMGg4LjExdjcxLjM1YzAsMTEuNjgsMy4yNywyMS4zNSw5LjgxLDI5LjAzLDYuNTQsNy42OCwxNS40MywxMS41MSwyNi42OCwxMS41MVoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im0xNzcuNTcsNjcuM3YtLjgxYzcuODktMS44NCwxNC4xOS01LjY1LDE4Ljg5LTExLjQzLDQuNy01Ljc4LDcuMDUtMTIuNzgsNy4wNS0yMSwwLTEwLjgxLTQuMDUtMTkuMTktMTIuMTYtMjUuMTQtOC4xMS01Ljk0LTE3Ljg0LTguOTItMjkuMTktOC45MmgtMzguOTJ2MTEzLjUxaDguMTFWNC44NmgzMC44MWM2LjcsMCwxMi43MywxLjQ5LDE4LjA4LDQuNDYsNS4zNSwyLjk3LDkuMzgsNy4zOCwxMi4wOCwxMy4yMiwxLjUxLDMuNjgsMi4yNyw3LjUxLDIuMjcsMTEuNTEsMCw4Ljc2LTMuMTYsMTUuODEtOS40OSwyMS4xNi01LjE1LDQuMzYtMTkuNyw3Ljc1LTE5LjcsNy43NWwzLjI0LDUuMTQsMzEuNjIsNDUuNDFoOS43M2wtMzIuNDMtNDYuMjJaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtMjMzLjUxLDBoMzBjMTcuNCwwLDMxLjg5LDUuMjIsNDMuNDYsMTUuNjUsMTEuNTcsMTAuNDMsMTcuMzUsMjQuMTQsMTcuMzUsNDEuMTFzLTUuODQsMzAuOTUtMTcuNTEsNDEuMjdjLTExLjY4LDEwLjMzLTI2LjExLDE1LjQ5LTQzLjMsMTUuNDloLTMwVjBabTMwLDQuODZoLTIxLjg5djEwMy43OGgyMS44OWMxNS4xMywwLDI3LjU3LTQuOTIsMzcuMy0xNC43Niw5LjczLTkuODQsMTQuNTktMjIuMjIsMTQuNTktMzcuMTRzLTQuOTItMjcuNTctMTQuNzYtMzcuM2MtOS44NC05LjczLTIyLjIyLTE0LjU5LTM3LjE0LTE0LjU5WiIvPjxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSIzOTMuMjQgMCAzODYuNzYgMCAzMzguMTEgMTEzLjUxIDM0NC41OSAxMTMuNTEgMzg3LjU3IDEwLjU0IDM4OC4zOCAxMC41NCA0MzIuMTYgMTEzLjUxIDQ0MS4wOCAxMTMuNTEgMzkzLjI0IDAiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im01MzQsOS41N2MtOC4zMy02LjM4LTE4LjIyLTkuNTctMjkuNjgtOS41N2gtNDAuNTR2NC44Nmg0MC41NGM5LjE5LDAsMTcuMDMsMi44NywyMy41MSw4LjU5LDYuNDksNS43Myw5LjczLDEzLjE0LDkuNzMsMjIuMjJzLTMuMTksMTYuNjItOS41NywyMi4zYy02LjM4LDUuNjgtMTQuMjcsOC41MS0yMy42OCw4LjUxaC00MC41NHY0Ny4wM2g4LjExdi00Mi4xNmgzMi40M2MxMS4zNSwwLDIxLjIyLTMuMTYsMjkuNTktOS40OSw4LjM4LTYuMzIsMTIuNTctMTUuMDUsMTIuNTctMjYuMTlzLTQuMTYtMTkuNzMtMTIuNDktMjYuMTFaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtNTc5LjczLDB2MTEzLjUxaC04LjExVjBoOC4xMVoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im02MjMuNTEsMHYxMDguNjVoNjYuNDlsLTEuNjIsNC44NmgtNzIuOTdWMGg4LjExWiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTcxOS4xOSwwdjEwOC42NWg2Ni40OWwtMS42Miw0Ljg2aC03Mi45N1YwaDguMTFaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtODE0Ljg2LDU3LjU3djUxLjA4aDY5LjczdjQuODZoLTc3Ljg0VjBoNzQuNmwtMS42Miw0Ljg2aC02NC44N3Y0Ny44NGg0OC42NWwtMS42Miw0Ljg2aC00Ny4wM1oiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im05MzIuNDMsMTEzLjUxVjQuODZoLTQxLjM1VjBoOTAuODFsLTEuNjIsNC44NmgtMzkuNzN2MTA4LjY1aC04LjExWiIvPjxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSIxMDMyLjE2IDAgMTAyNS42OCAwIDk3Ny4wMyAxMTMuNTEgOTgzLjUxIDExMy41MSAxMDI2LjQ5IDEwLjU0IDEwMjcuMyAxMC41NCAxMDcxLjA4IDExMy41MSAxMDgwIDExMy41MSAxMDMyLjE2IDAiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im00MTIuNzgsMjE2Ljg3aC05LjE4djEyLjA4aC0zLjU4di0zMS4zM2gxMC45N2MzLjM3LDAsNi4yMy44MSw4LjU3LDIuNDQsMi4zNCwxLjYzLDMuNTEsNC4wMiwzLjUxLDcuMTgsMCwyLjEyLS42LDMuOTQtMS44MSw1LjQ2LTEuMjEsMS41Mi0yLjg0LDIuNTQtNC45LDMuMDR2LjIybDguOTUsMTIuOThoLTQuMjVsLTguMjgtMTIuMDhabS05LjE4LTIuMjRoNy4zOGMyLjM5LDAsNC4zNi0uNjYsNS45My0xLjk3LDEuNTctMS4zMSwyLjM1LTMuMTIsMi4zNS01LjQycy0uNzktNC4xOC0yLjM3LTUuNDZjLTEuNTgtMS4yOC0zLjU1LTEuOTMtNS45MS0xLjkzaC03LjM4djE0Ljc3WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTQzNC40OSwyMTMuOTZ2MTIuNzZoMTguOHYyLjI0aC0yMi4zOHYtMzEuMzNoMjEuNzFsLS40NSwyLjI0aC0xNy42OHYxMS44NmgxMy4ybC0uNDUsMi4yNGgtMTIuNzZaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtNDgwLjgxLDIyOC45NWwtMy4zNi04LjA2aC0xNS44OWwtMy4zNiw4LjA2aC0yLjY5bDEzLjItMzEuMzNoMi45MWwxMy4yLDMxLjMzaC00LjAzWm0tMTEuNDEtMjYuODVsLTYuOTQsMTYuNTZoMTQuMWwtNi45NC0xNi41NmgtLjIyWiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTQ5My41NiwxOTcuNjJ2MjkuMDloMTcuOWwtLjQ1LDIuMjRoLTIxLjA0di0zMS4zM2gzLjU4WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTUzMC43MSwyMTMuOTZ2MTIuNzZoMTguOHYyLjI0aC0yMi4zOHYtMzEuMzNoMjEuNzFsLS40NSwyLjI0aC0xNy42OHYxMS44NmgxMy4ybC0uNDUsMi4yNGgtMTIuNzVaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtNTUzLjk5LDIwNS4wMWMwLTEuNzkuNi0zLjM1LDEuODEtNC42OCwxLjIxLTEuMzMsMi43Mi0yLjMxLDQuNTQtMi45MywxLjM0LS40NSwyLjg4LS42Nyw0LjYxLS42NywyLjE1LDAsNC4yLjUzLDYuMTUsMS41OSwxLjk1LDEuMDYsMy42MywyLjQ3LDUuMDQsNC4yM2wtMS4zNCwxLjEyYy0xLjI4LTEuNDktMi43OC0yLjY5LTQuNS0zLjU4LTEuNzItLjktMy41LTEuMzQtNS4zNS0xLjM0cy0zLjU4LjU4LTUuMDEsMS43NWMtMS40MywxLjE2LTIuMTUsMi42Ny0yLjE1LDQuNTIsMCwuNjMuMTQsMS4yLjQyLDEuNzIuMjguNTIuNy45OCwxLjI1LDEuMzkuNTUuNCwxLjA2LjczLDEuNTIuOTguNDYuMjUsMS4wMi41MSwxLjY4Ljc4LDEuMTYuNTQsMi42NywxLjEzLDQuNTIsMS43OSwxLjI4LjQ1LDIuMzkuOSwzLjMxLDEuMzQuOTMuNDUsMS44OSwxLjAzLDIuOTEsMS43NSwxLjAxLjcyLDEuOCwxLjU3LDIuMzUsMi41Ny41NSwxLC44MywyLjExLjgzLDMuMzQsMCwxLjk3LS42NSwzLjY4LTEuOTUsNS4xNS0xLjMsMS40Ni0yLjk1LDIuNTUtNC45NSwzLjI3LTEuNTIuNTEtMy4xOC43Ni00Ljk3Ljc2LTIuNTEsMC00LjkxLS42My03LjIxLTEuODgtMi4zLTEuMjUtNC4xNS0yLjk0LTUuNTUtNS4wNmwxLjM0LTEuMTJjMS4yOCwxLjg4LDIuOTQsMy4zNiw0Ljk3LDQuNDMsMi4wMywxLjA3LDQuMTgsMS42MSw2LjQ0LDEuNjFzNC4xOC0uNjUsNS43My0xLjk1YzEuNTUtMS4zLDIuMzMtMy4wMywyLjMzLTUuMjEsMC0uNjMtLjE0LTEuMi0uNDItMS43Mi0uMjktLjUyLS43LS45OS0xLjI1LTEuNDEtLjU1LS40Mi0xLjA1LS43NC0xLjUtLjk4LS40NS0uMjQtMS4wMS0uNTEtMS43LS44MS0xLjI4LS41NC0yLjc5LTEuMTItNC41Mi0xLjc1LTEuMjgtLjQ1LTIuMzktLjktMy4zMS0xLjM0LS45My0uNDUtMS45LTEuMDMtMi45MS0xLjc1LTEuMDEtLjcyLTEuOC0xLjU3LTIuMzUtMi41Ny0uNTUtMS0uODMtMi4xMS0uODMtMy4zNFoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im01OTAuMDIsMjI4Ljk1di0yOS4wOWgtMTAuOTd2LTIuMjRoMjUuNTFsLS40NSwyLjI0aC0xMC41MnYyOS4wOWgtMy41OFoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im02MjguMDYsMjI4Ljk1bC0zLjM2LTguMDZoLTE1Ljg5bC0zLjM2LDguMDZoLTIuNjlsMTMuMi0zMS4zM2gyLjkxbDEzLjIsMzEuMzNoLTQuMDNabS0xMS40MS0yNi44NWwtNi45NCwxNi41NmgxNC4xbC02Ljk0LTE2LjU2aC0uMjJaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtNjQxLjI2LDIyOC45NXYtMjkuMDloLTEwLjk3di0yLjI0aDI1LjUxbC0uNDUsMi4yNGgtMTAuNTJ2MjkuMDloLTMuNThaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtNjY0LjA5LDIxMy45NnYxMi43NmgxOC44djIuMjRoLTIyLjM4di0zMS4zM2gyMS43MWwtLjQ1LDIuMjRoLTE3LjY4djExLjg2aDEzLjJsLS40NSwyLjI0aC0xMi43NloiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im0zNTIuODgsMzExLjMxbC05LjE4LDE0LjYzaC0uNjJsLTkuMTktMTQuNjNoLS4xNnYxOC4wNmgtMS41NnYtMjEuOGgyLjM0bDkuMzQsMTQuOTRoLjE2bDkuMzQtMTQuOTRoMi4xOHYyMS44aC0yLjQ5di0xOC4wNmgtLjE2WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTM2My45MywzMDcuNTd2MjEuOGgtMi40OXYtMjEuOGgyLjQ5WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTM4NS4xLDMyOS4zN2wtMi4zNC01LjZoLTExLjA1bC0yLjM0LDUuNmgtMS44N2w5LjE5LTIxLjhoMi4wMmw5LjE5LDIxLjhoLTIuOFptLTcuOTQtMTguNjhsLTQuODIsMTEuNTJoOS44MWwtNC44Mi0xMS41MmgtLjE2WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTQxMi4xOSwzMTEuMzFsLTkuMTksMTQuNjNoLS42MmwtOS4xOC0xNC42M2gtLjE2djE4LjA2aC0xLjU2di0yMS44aDIuMzRsOS4zNCwxNC45NGguMTZsOS4zNC0xNC45NGgyLjE4djIxLjhoLTIuNDl2LTE4LjA2aC0uMTZaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtNDIzLjI1LDMwNy41N3YyMS44aC0yLjQ5di0yMS44aDIuNDlaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtNjA1Ljc3LDMxOS43MXY5LjY1aC0yLjQ5di0yMS44aDE0Ljk1bC0uMzEsMS41NmgtMTIuMTR2OS4wM2g5LjY1bC0uMzEsMS41NmgtOS4zNFoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im02MjMuOTgsMzA3LjU3djIwLjI0aDEyLjQ1bC0uMzEsMS41NmgtMTQuNjN2LTIxLjhoMi40OVoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Im02MzcuODQsMzE4LjQ3YzAtMy4yMiwxLjA4LTUuOTQsMy4yMi04LjE3LDIuMTUtMi4yMyw0LjgxLTMuMzUsNy45OS0zLjM1czUuODksMS4xMiw4LjAyLDMuMzZjMi4xMywyLjI0LDMuMTksNC45NiwzLjE5LDguMTZzLTEuMDgsNS45Mi0zLjI0LDguMTYtNC44MiwzLjM2LTcuOTcsMy4zNi01Ljg0LTEuMTMtNy45OS0zLjM4Yy0yLjE1LTIuMjUtMy4yMi00Ljk3LTMuMjItOC4xNFptMTkuNzcsMGMwLTEuNy0uMzMtMy4zMi0xLTQuODQtLjY3LTEuNTMtMS42Ni0yLjc5LTIuOTktMy43OC0xLjMzLTEtMi44NS0xLjQ5LTQuNTgtMS40OS0yLjU3LDAtNC42NCwxLjAzLTYuMjEsMy4wOC0xLjU3LDIuMDUtMi4zNSw0LjQtMi4zNSw3LjA0LDAsMS45OS40NiwzLjg2LDEuMzgsNS42LjkyLDEuNzQsMi4yNCwzLDMuOTQsMy43NywxLjA0LjUsMi4xMi43NSwzLjI0Ljc1LDEuNzgsMCwzLjM4LS41Niw0Ljc5LTEuNjgsMS40MS0xLjEyLDIuNDQtMi41NSwzLjA4LTQuMy40Ni0xLjIyLjY4LTIuNi42OC00LjE0WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTY3My42NCwzMjAuOTZoLTYuMzh2OC40MWgtMi40OXYtMjEuOGg3LjYzYzIuMzUsMCw0LjMzLjU3LDUuOTYsMS43LDEuNjMsMS4xMywyLjQ0LDIuOCwyLjQ0LDUsMCwxLjQ3LS40MiwyLjc0LTEuMjYsMy44LS44NCwxLjA2LTEuOTgsMS43Ny0zLjQxLDIuMTJ2LjE2bDYuMjMsOS4wM2gtMi45NmwtNS43Ni04LjQxWm0tNi4zOC0xLjU2aDUuMTRjMS42NiwwLDMuMDMtLjQ2LDQuMTMtMS4zNywxLjA5LS45MSwxLjYzLTIuMTcsMS42My0zLjc3cy0uNTUtMi45MS0xLjY1LTMuOGMtMS4xLS44OS0yLjQ3LTEuMzQtNC4xMS0xLjM0aC01LjE0djEwLjI4WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTY4OC43NCwzMDcuNTd2MjEuOGgtMi40OXYtMjEuOGgyLjQ5WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTY5NC42NiwzMDcuNTdoNi4yM2MzLjMyLDAsNi4xMiwxLjAxLDguNDEsMy4wMywyLjI4LDIuMDIsMy40Miw0LjY0LDMuNDIsNy44NnMtMS4xNiw1Ljg5LTMuNDcsNy44OWMtMi4zMSwyLTUuMSwzLTguMzYsM2gtNi4yM3YtMjEuOFptNi4yMywxLjU2aC0zLjc0djE4LjY4aDMuNzRjMi43LDAsNC45LS44OSw2LjYyLTIuNjgsMS43MS0xLjc5LDIuNTctNC4wMSwyLjU3LTYuNjZzLS44Ni00Ljk1LTIuNTgtNi43MS0zLjkyLTIuNjMtNi42LTIuNjNaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJtNzMyLjQ5LDMyOS4zN2wtMi4zNC01LjZoLTExLjA1bC0yLjM0LDUuNmgtMS44N2w5LjE5LTIxLjhoMi4wMmw5LjE5LDIxLjhoLTIuOFptLTcuOTQtMTguNjhsLTQuODIsMTEuNTJoOS44MWwtNC44Mi0xMS41MmgtLjE2WiIvPjxyZWN0IGNsYXNzPSJjbHMtMSIgeD0iNDc4LjI0IiB5PSIzMTkuODQiIHdpZHRoPSI3MC4wNSIgaGVpZ2h0PSIxLjQ2Ii8+PC9nPjwvc3ZnPg==';
+const TV_ID = 'tv2';
 const app = initializeApp({
   apiKey: "AIzaSyB6Lqm6q3v6NgJez8Q9KmbmmPVmtuLXUF8",
   authDomain: "urdapilleta-vidriera.firebaseapp.com",
@@ -77,24 +77,34 @@ const app = initializeApp({
 const db = getDatabase(app);
 
 let tvPlayers = {};
-let currentIdx = 0;
-let slides = [];
-let propList = [];
+let currentMode = null;
 
 function convertYT(url) {
   if (!url) return '';
-  if (url.includes('youtube.com/watch?v=')) {
-    const id = url.split('v=')[1].split('&')[0];
-    return 'https://www.youtube.com/embed/' + id + '?autoplay=1&mute=1&loop=1&playlist=' + id + '&controls=0&modestbranding=1&playsinline=1&rel=0';
-  } else if (url.includes('/embed/')) {
-    const id = url.split('/embed/')[1].split('?')[0];
-    return url.includes('?') ? url : 'https://www.youtube.com/embed/' + id + '?autoplay=1&mute=1&loop=1&playlist=' + id + '&controls=0&modestbranding=1&playsinline=1&rel=0';
-  }
-  return url;
+  let id = '';
+  if (url.includes('youtube.com/watch?v=')) id = url.split('v=')[1].split('&')[0];
+  else if (url.includes('youtu.be/')) id = url.split('youtu.be/')[1].split('?')[0];
+  else if (url.includes('/embed/')) id = url.split('/embed/')[1].split('?')[0];
+  if (!id) return url;
+  return 'https://www.youtube.com/embed/' + id + '?autoplay=1&mute=1&loop=1&playlist=' + id + '&controls=0&modestbranding=1&playsinline=1&rel=0';
 }
 
-function buildSlides(list) {
-  const s = [{ type: 'intro' }];
+function showLogo() {
+  document.getElementById('app').innerHTML = `
+    <div class="logo-screen">
+      <img src="${LOGO_SRC}" alt="Urdapilleta Real Estate">
+    </div>`;
+}
+
+function showVideo(url) {
+  const src = convertYT(url);
+  document.getElementById('app').innerHTML = `
+    <iframe src="${src}" class="full-iframe" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"></iframe>`;
+}
+
+function buildSlides(list, tipo) {
+  const TIPO_NAME = tipo === 'venta' ? 'PROPIEDADES EN VENTA' : 'PROPIEDADES EN RENTA';
+  const s = [{ type: 'intro', tipoName: TIPO_NAME }];
   list.forEach((p, i) => {
     s.push({ type: 'property', prop: p });
     if (i < list.length - 1) s.push({ type: 'separator', num: i+1, total: list.length });
@@ -102,119 +112,168 @@ function buildSlides(list) {
   return s;
 }
 
-function renderTV(list) {
+function renderProperties(propiedades, tipo) {
   if (tvPlayers.timer) clearTimeout(tvPlayers.timer);
-  propList = list;
-  const container = document.getElementById('tv-screen');
-  
-  // Remove old slides (keep strip and progress)
-  container.querySelectorAll('[data-slide]').forEach(el => el.remove());
-  
+  const container = document.getElementById('app');
+  const list = propiedades.filter(p => p.tipo === tipo && (p.estado === 'activo' || p.estado === 'under-contract'));
+  const stripColor = tipo === 'venta' ? 'linear-gradient(90deg,#2D5A96,#7BA7D4,#2D5A96)' : 'linear-gradient(90deg,#2D7A4F,#5CBA8A,#2D7A4F)';
+
   if (!list.length) {
-    container.innerHTML += `<div class="tv-empty"><img src="${LOGO_SRC}" alt=""><div class="tv-empty-txt">Sin propiedades activas</div></div>`;
+    container.innerHTML = `<div style="width:100%;height:100%;background:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem">
+      <img src="${LOGO_SRC}" style="width:50%;max-width:400px" alt="">
+      <div style="font-family:Karla,sans-serif;font-size:0.9rem;color:#aab0c4">Sin propiedades activas</div>
+    </div>`;
     return;
   }
 
-  slides = buildSlides(list);
-  let html = '';
-
+  const slides = buildSlides(list, tipo);
+  let slidesHTML = '';
   slides.forEach((slide, idx) => {
     if (slide.type === 'intro') {
-      html += `<div class="tv-intro" id="slide-${idx}" data-slide="${idx}">
-        <img src="${LOGO_SRC}" alt="Urdapilleta">
+      slidesHTML += `<div class="tv-intro" id="slide-${idx}" data-slide="${idx}" style="background:#fff">
+        <img src="${LOGO_SRC}" style="width:55%;max-width:500px;margin-bottom:8px" alt="">
         <div class="intro-bar"></div>
-        <div class="intro-type-badge">${TIPO_NAME}</div>
+        <div class="intro-type-badge">${slide.tipoName}</div>
       </div>`;
     } else if (slide.type === 'separator') {
-      html += `<div class="tv-separator-slide" id="slide-${idx}" data-slide="${idx}">
-        <img src="${LOGO_SRC}" alt="">
+      slidesHTML += `<div class="tv-separator-slide" id="slide-${idx}" data-slide="${idx}" style="background:#fff">
+        <img src="${LOGO_SRC}" style="width:45%;max-width:380px" alt="">
         <div class="sep-line"></div>
         <div class="sep-count">${slide.num} / ${slide.total}</div>
       </div>`;
     } else {
       const p = slide.prop;
-      const vsrc = convertYT(p.video);
-      const videoContent = vsrc
-        ? `<iframe src="${vsrc}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"></iframe>`
-        : `<div class="tv-no-video"><img src="${LOGO_SRC}" alt=""><div class="tv-no-video-txt">Sin video</div></div>`;
+      let vsrc = '';
+      if (p.video) {
+        let id = '';
+        if (p.video.includes('youtube.com/watch?v=')) id = p.video.split('v=')[1].split('&')[0];
+        else if (p.video.includes('/embed/')) id = p.video.split('/embed/')[1].split('?')[0];
+        if (id) vsrc = 'https://www.youtube.com/embed/' + id + '?autoplay=1&mute=1&loop=1&playlist=' + id + '&controls=0&modestbranding=1&playsinline=1&rel=0';
+      }
+      const fotos = p.fotos && p.fotos.length > 0 ? p.fotos : [];
+      let media = '';
+      if (vsrc) {
+        media = `<iframe src="${vsrc}" allow="autoplay;encrypted-media;fullscreen" allowfullscreen sandbox="allow-scripts allow-same-origin allow-presentation allow-popups" style="width:100%;height:115%;border:none;display:block;margin-top:-8%"></iframe>`;
+      } else if (fotos.length > 0) {
+        const photos = fotos.map((f,fi) => `<div style="position:absolute;inset:0;background:url('${f}') center/cover no-repeat;transition:opacity 1.2s;opacity:${fi===0?1:0}" data-photo="${fi}"></div>`).join('');
+        media = `<div style="position:relative;width:100%;height:100%" data-carousel data-total="${fotos.length}">${photos}</div>`;
+      } else {
+        media = `<div style="width:100%;height:100%;background:linear-gradient(160deg,#0d1020,#162040);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem">
+          <img src="${LOGO_SRC}" style="width:30%;opacity:0.15" alt="">
+          <div style="font-family:Karla,sans-serif;font-size:0.9rem;color:rgba(255,255,255,0.2)">Sin video ni fotos</div>
+        </div>`;
+      }
       const specs = [];
       if (p.habs) specs.push(`<div class="tv-spec-pill">🛏 ${p.habs}</div>`);
       if (p.banos) specs.push(`<div class="tv-spec-pill">🚿 ${p.banos}</div>`);
       if (p.m2) specs.push(`<div class="tv-spec-pill">📐 ${p.m2}</div>`);
-      if (p.tags) p.tags.slice(0,3).forEach(t => specs.push(`<div class="tv-spec-pill">${t}</div>`));
-      html += `<div class="tv-property-slide" id="slide-${idx}" data-slide="${idx}">
-        ${videoContent}
+      if (p.tags) p.tags.slice(0,2).forEach(t => specs.push(`<div class="tv-spec-pill">${t}</div>`));
+      slidesHTML += `<div class="tv-property-slide" id="slide-${idx}" data-slide="${idx}">
+        ${media}
         <div class="tv-banner">
-          <div class="tv-banner-price">${p.precio}</div>
-          <div class="tv-banner-name">${p.nombre}</div>
-          <div class="tv-banner-loc">📍 ${p.ubicacion}</div>
-          <div class="tv-banner-specs">${specs.join('')}</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:0.5rem">
+            <div style="flex:1;min-width:0">
+              <div class="tv-banner-price">${p.precio}</div>
+              <div class="tv-banner-name">${p.nombre}</div>
+              <div class="tv-banner-loc">📍 ${p.ubicacion}</div>
+              ${p.estado === 'under-contract' ? '<div class="tv-under-contract-badge">🔒 Under Contract</div>' : ''}
+              ${p.desc ? `<div class="tv-banner-desc">${p.desc}</div>` : ''}
+              <div class="tv-banner-specs">${specs.join('')}</div>
+            </div>
+            <div class="tv-qr">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https://urdapilletarealestate.com&color=7BA7D4&bgcolor=00000000" alt="QR" style="width:65px;height:65px;border-radius:5px;padding:2px">
+              <div style="font-size:0.48rem;color:rgba(255,255,255,0.35);text-align:center;margin-top:2px;letter-spacing:0.06em">urdapilletarealestate.com</div>
+            </div>
+          </div>
         </div>
       </div>`;
     }
   });
 
-  // Insert slides before strip
-  const strip = container.querySelector('.tv-strip');
-  strip.insertAdjacentHTML('afterend', html);
+  const dots = list.map((_,i) => `<div class="tv-dot${i===0?' active':''}" id="dot-${i}"></div>`).join('');
+  container.innerHTML = `<div class="tv-screen" style="width:100%;height:100%;position:relative;background:#000;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;right:0;height:4px;background:${stripColor};z-index:20"></div>
+    ${slidesHTML}
+    <div class="tv-progress">${dots}</div>
+  </div>`;
 
-  // Progress dots
-  const progress = document.getElementById('tv-progress');
-  progress.innerHTML = list.map((_, i) => `<div class="tv-dot${i===0?' active':''}" id="dot-${i}"></div>`).join('');
+  // Start photo carousels
+  container.querySelectorAll('[data-carousel]').forEach(c => {
+    const total = parseInt(c.dataset.total);
+    if (total <= 1) return;
+    let cur = 0;
+    setInterval(() => {
+      c.children[cur].style.opacity = 0;
+      cur = (cur+1) % total;
+      c.children[cur].style.opacity = 1;
+    }, 4000);
+  });
 
-  currentIdx = 0;
+  let currentIdx = 0;
+  const DURATIONS = { intro:3000, property:12000, separator:2500 };
+
+  function showSlide(idx) {
+    container.querySelectorAll('[data-slide]').forEach(el => {
+      el.classList.remove('active');
+      if (el.classList.contains('tv-intro')) el.classList.add('hidden');
+    });
+    const target = document.getElementById('slide-' + idx);
+    if (!target) { currentIdx=0; showSlide(0); return; }
+    if (target.classList.contains('tv-intro')) target.classList.remove('hidden');
+    else target.classList.add('active');
+    const s = slides[idx];
+    if (s && s.type === 'property') {
+      const pi = list.findIndex(p => p.id === s.prop.id);
+      container.querySelectorAll('.tv-dot').forEach((d,i) => d.classList.toggle('active', i===pi));
+    }
+  }
+
+  function scheduleNext() {
+    if (tvPlayers.timer) clearTimeout(tvPlayers.timer);
+    const dur = slides[currentIdx] ? DURATIONS[slides[currentIdx].type]||5000 : 5000;
+    tvPlayers.timer = setTimeout(() => {
+      currentIdx = (currentIdx+1) % slides.length;
+      showSlide(currentIdx);
+      scheduleNext();
+    }, dur);
+  }
+
   showSlide(0);
   scheduleNext();
 }
 
-function showSlide(idx) {
-  document.querySelectorAll('[data-slide]').forEach(el => {
-    el.classList.remove('active');
-    if (el.classList.contains('tv-intro')) el.classList.add('hidden');
-  });
-  const target = document.getElementById('slide-' + idx);
-  if (!target) { currentIdx = 0; showSlide(0); return; }
-  if (target.classList.contains('tv-intro')) target.classList.remove('hidden');
-  else target.classList.add('active');
-  const slide = slides[idx];
-  if (slide && slide.type === 'property') {
-    const pi = propList.findIndex(p => p.id === slide.prop.id);
-    document.querySelectorAll('.tv-dot').forEach((d,i) => d.classList.toggle('active', i===pi));
-  }
-}
-
-const DURATIONS = { intro: 3000, property: 12000, separator: 2500 };
-function scheduleNext() {
-  if (tvPlayers.timer) clearTimeout(tvPlayers.timer);
-  const dur = slides[currentIdx] ? DURATIONS[slides[currentIdx].type] || 5000 : 5000;
-  tvPlayers.timer = setTimeout(() => {
-    currentIdx = (currentIdx + 1) % slides.length;
-    showSlide(currentIdx);
-    scheduleNext();
-  }, dur);
-}
+// Listen to Firebase for both tvConfig and propiedades
+let propiedadesData = [];
+let tvConfigData = {};
 
 onValue(ref(db, 'vidriera'), (snap) => {
   const data = snap.val();
-  if (!data || !data.propiedades) return;
-  const filtered = data.propiedades.filter(p => p.tipo === TIPO && p.estado === 'activo');
-  renderTV(filtered);
-});
-</script>
-<script>
-// Auto-recargar cada 2 horas para mantener videos activos
-setInterval(() => { location.reload(); }, 2 * 60 * 60 * 1000);
-
-// Si la pagina lleva mas de 10 segundos sin cambios visibles, verificar conexion
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) {
-    // Recargar si la pagina estuvo oculta mas de 1 hora
-    if (window._lastVisible && Date.now() - window._lastVisible > 60 * 60 * 1000) {
-      location.reload();
+  if (!data) return;
+  if (data.propiedades) propiedadesData = data.propiedades;
+  if (data.tvConfig) tvConfigData = data.tvConfig;
+  
+  const cfg = tvConfigData[TV_ID] || { modo: TV_ID === 'tv2' ? 'venta' : TV_ID === 'tv3' ? 'renta' : 'logo', video: '' };
+  
+  // Only re-render if mode changed
+  if (cfg.modo !== currentMode) {
+    currentMode = cfg.modo;
+    if (cfg.modo === 'logo' || (!cfg.video && cfg.modo === 'video')) {
+      showLogo();
+    } else if (cfg.modo === 'video' && cfg.video) {
+      showVideo(cfg.video);
+    } else if (cfg.modo === 'venta' || cfg.modo === 'renta') {
+      renderProperties(propiedadesData, cfg.modo);
     }
-  } else {
-    window._lastVisible = Date.now();
+  } else if ((cfg.modo === 'venta' || cfg.modo === 'renta') && data.propiedades) {
+    renderProperties(propiedadesData, cfg.modo);
   }
+});
+
+// Auto-reload every 2 hours
+setInterval(() => location.reload(), 2 * 60 * 60 * 1000);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && window._lastHidden && Date.now() - window._lastHidden > 60*60*1000) location.reload();
+  else if (document.hidden) window._lastHidden = Date.now();
 });
 </script>
 </body>
