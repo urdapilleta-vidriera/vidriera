@@ -183,6 +183,8 @@
   .badge-alquilado { background: #FDF6E3; color: #7A5C00; }
   .badge-video { background: var(--brand-light); color: var(--brand); font-size: 0.65rem; padding: 2px 7px; }
   .badge-sin-video { background: rgba(0,0,0,0.05); color: #999; font-size: 0.65rem; padding: 2px 7px; }
+  .badge-under-contract { background: #FFF3CD; color: #856404; }
+  .badge-under { background: #FFF3E0; color: #E65100; }
 
   .btn {
     border: none;
@@ -552,6 +554,20 @@
     opacity: 0.1;
   }
   .tv-empty-txt { font-size: 0.7rem; color: rgba(255,255,255,0.15); font-family: 'Karla', sans-serif; }
+  .tv-banner-desc { font-size: 0.66rem; color: rgba(255,255,255,0.65); font-style: italic; margin: 4px 0 6px; max-width: 90%; line-height: 1.4; }
+  .tv-under-contract-badge {
+    display: inline-block;
+    background: rgba(255, 200, 0, 0.9);
+    color: #1a1200;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+  .tv-qr { flex-shrink: 0; margin-left: 0.75rem; display: flex; flex-direction: column; align-items: center; }
 
   /* Screen 4 */
   .screen-video {
@@ -720,6 +736,7 @@
             <label>Estado</label>
             <select id="f-estado">
               <option value="activo">Activo — visible</option>
+              <option value="under_contract">Under Contract — visible con badge</option>
               <option value="vendido">Vendido / Alquilado</option>
             </select>
           </div>
@@ -729,12 +746,18 @@
           <input type="text" id="f-tags" placeholder="Ej: Piscina, Garaje, Vista al mar">
         </div>
         <div class="form-group">
-          <label>🎬 Video de la propiedad (YouTube embed URL)</label>
-          <input type="text" id="f-video" placeholder="https://www.youtube.com/embed/VIDEO_ID">
-          <div class="video-hint">
-            En YouTube: Compartir → Insertar → copiá la URL del src.<br>
-            Ej: <strong>https://www.youtube.com/embed/dQw4w9WgXcQ</strong>
-          </div>
+          <label>📝 Descripción / Hook</label>
+          <textarea id="f-desc" rows="2" placeholder="Ej: Viví el lujo frente al mar. Esta joya combina diseño moderno con vistas incomparables." style="resize:vertical"></textarea>
+        </div>
+        <div class="form-group">
+          <label>🎬 Video (link de YouTube)</label>
+          <input type="text" id="f-video" placeholder="https://www.youtube.com/watch?v=...">
+          <div class="video-hint">Pegá el link normal de YouTube — se convierte automáticamente</div>
+        </div>
+        <div class="form-group">
+          <label>📸 Fotos (links de Google Drive, una por línea)</label>
+          <textarea id="f-fotos" rows="3" placeholder="https://drive.google.com/file/d/ABC/view" style="resize:vertical"></textarea>
+          <div class="video-hint">En Google Drive: clic derecho → Compartir → Cualquier persona con el link</div>
         </div>
         <div class="form-actions">
           <button class="btn btn-primary" onclick="guardarPropiedad()" style="flex:1">Guardar propiedad</button>
@@ -814,7 +837,7 @@ function showTab(tab, btn) {
 }
 
 function renderStats() {
-  const activos = propiedades.filter(p => p.estado === 'activo');
+  const activos = propiedades.filter(p => p.estado === 'activo' || p.estado === 'under_contract');
   const venta = activos.filter(p => p.tipo === 'venta').length;
   const renta = activos.filter(p => p.tipo === 'renta').length;
   document.getElementById('stats-row').innerHTML = `
@@ -870,6 +893,13 @@ function guardarPropiedad() {
   const banos = document.getElementById('f-banos').value.trim();
   const m2 = document.getElementById('f-m2').value.trim();
   const tagsRaw = document.getElementById('f-tags').value.trim();
+  const desc = document.getElementById('f-desc') ? document.getElementById('f-desc').value.trim() : '';
+  const fotosEl = document.getElementById('f-fotos');
+  const fotos = fotosEl && fotosEl.value.trim() ? fotosEl.value.trim().split('\n').map(f => {
+    f = f.trim();
+    if (f.includes('/file/d/')) { const id = f.split('/file/d/')[1].split('/')[0]; return 'https://drive.google.com/file/d/' + id + '/preview'; }
+    return f;
+  }).filter(Boolean) : [];
   let video = document.getElementById('f-video').value.trim();
   // Auto-convertir URL normal de YouTube a embed
   if (video.includes('youtube.com/watch?v=')) {
@@ -885,9 +915,9 @@ function guardarPropiedad() {
   const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
   if (editId) {
     const idx = propiedades.findIndex(p => p.id == editId);
-    if (idx >= 0) { propiedades[idx] = { ...propiedades[idx], nombre, tipo, precio, ubicacion, habs, banos, m2, tags, video, estado }; toast('Propiedad actualizada'); }
+    if (idx >= 0) { propiedades[idx] = { ...propiedades[idx], nombre, tipo, precio, ubicacion, habs, banos, m2, tags, desc, fotos, video, estado }; toast('Propiedad actualizada'); }
   } else {
-    propiedades.push({ id: nextId++, nombre, tipo, precio, ubicacion, habs, banos, m2, tags, video, estado });
+    propiedades.push({ id: nextId++, nombre, tipo, precio, ubicacion, habs, banos, m2, tags, desc, fotos, video, estado });
     toast('Propiedad agregada');
   }
   resetForm(); renderTabla(); renderStats();
@@ -907,6 +937,8 @@ function editarPropiedad(id) {
   document.getElementById('f-m2').value = p.m2;
   document.getElementById('f-tags').value = p.tags.join(', ');
   document.getElementById('f-video').value = p.video || '';
+  if(document.getElementById('f-desc')) document.getElementById('f-desc').value = p.desc || '';
+  if(document.getElementById('f-fotos')) document.getElementById('f-fotos').value = p.fotos ? p.fotos.map(f => f.replace('/preview', '/view')).join('\n') : '';
   document.getElementById('f-estado').value = p.estado;
   document.getElementById('form-title').textContent = 'Editar propiedad';
   document.querySelector('.card-body').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -915,8 +947,9 @@ function editarPropiedad(id) {
 function cambiarEstado(id, nuevoEstado) {
   const p = propiedades.find(x => x.id === id);
   if (!p) return;
-  p.estado = nuevoEstado === 'activo' ? 'activo' : 'vendido';
-  toast(nuevoEstado === 'activo' ? '✓ Propiedad reactivada' : '✓ Retirada de pantalla');
+  p.estado = nuevoEstado;
+  const msgs = { activo: '✓ Propiedad reactivada', under_contract: '🔶 Marcada como Under Contract', vendido: '✓ Retirada de pantalla', alquilado: '✓ Retirada de pantalla' };
+  toast(msgs[nuevoEstado] || '✓ Estado actualizado');
   renderTabla(); renderStats();
   if(window.syncFirebase) window.syncFirebase();
 }
@@ -929,7 +962,7 @@ function eliminarPropiedad(id) {
 }
 
 function resetForm() {
-  ['edit-id','f-nombre','f-precio','f-ubicacion','f-habs','f-banos','f-m2','f-tags','f-video'].forEach(id => document.getElementById(id).value = '');
+  ['edit-id','f-nombre','f-precio','f-ubicacion','f-habs','f-banos','f-m2','f-tags','f-video'].forEach(id => document.getElementById(id).value = ''); if(document.getElementById('f-desc')) document.getElementById('f-desc').value = ''; if(document.getElementById('f-fotos')) document.getElementById('f-fotos').value = '';
   document.getElementById('f-tipo').value = 'venta';
   document.getElementById('f-estado').value = 'activo';
   document.getElementById('form-title').textContent = 'Agregar propiedad';
@@ -1007,26 +1040,38 @@ function renderTVScreen(containerId, propList, tipo) {
     const vidId = p.video.includes('/embed/') ? p.video.split('/embed/')[1].split('?')[0] : '';
     videoSrc = p.video + '?autoplay=1&mute=1&controls=0&loop=1&playlist=' + vidId + '&modestbranding=1&playsinline=1&rel=0&showinfo=0';
   }
-      const videoContent = p.video
-        ? `<iframe src="${videoSrc}" 
-            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-            allowfullscreen 
-            frameborder="0" 
-            style="width:100%;height:115%;border:none;display:block;margin-top:-8%"
-            sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"></iframe>`
-        : `<div class="tv-no-video"><img src="${LOGO_SRC}" alt=""><div class="tv-no-video-txt">Sin video — agregá una URL en el panel</div></div>`;
+      const fotos = p.fotos && p.fotos.length > 0 ? p.fotos : [];
+      let mediaContent = '';
+      if (videoSrc) {
+        mediaContent = `<iframe src="${videoSrc}" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen frameborder="0" style="width:100%;height:115%;border:none;display:block;margin-top:-8%" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"></iframe>`;
+      } else if (fotos.length > 0) {
+        const photoHTML = fotos.map((f, fi) => `<div class="photo-slide" style="position:absolute;inset:0;background:url('${f}') center/cover no-repeat;transition:opacity 1.2s ease;opacity:${fi===0?1:0}"></div>`).join('');
+        mediaContent = `<div class="photo-carousel" data-total="${fotos.length}" style="position:relative;width:100%;height:100%">${photoHTML}</div>`;
+      } else {
+        mediaContent = `<div class="tv-no-video"><img src="${LOGO_SRC}" alt=""><div class="tv-no-video-txt">Sin video ni fotos — agregá en el panel</div></div>`;
+      }
       const specs = [];
       if (p.habs) specs.push(`<div class="tv-spec-pill">🛏 ${p.habs}</div>`);
       if (p.banos) specs.push(`<div class="tv-spec-pill">🚿 ${p.banos}</div>`);
       if (p.m2) specs.push(`<div class="tv-spec-pill">📐 ${p.m2}</div>`);
-      p.tags.slice(0,3).forEach(t => specs.push(`<div class="tv-spec-pill">${t}</div>`));
+      if (p.tags) p.tags.slice(0,2).forEach(t => specs.push(`<div class="tv-spec-pill">${t}</div>`));
       slidesHTML += `<div class="tv-property-slide" id="${containerId}-slide-${idx}" data-slide="${idx}">
-        ${videoContent}
+        ${mediaContent}
         <div class="tv-banner">
-          <div class="tv-banner-price">${p.precio}</div>
-          <div class="tv-banner-name">${p.nombre}</div>
-          <div class="tv-banner-loc">📍 ${p.ubicacion}</div>
-          <div class="tv-banner-specs">${specs.join('')}</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:0.5rem">
+            <div style="flex:1;min-width:0">
+              <div class="tv-banner-price">${p.precio}</div>
+              <div class="tv-banner-name">${p.nombre}</div>
+              <div class="tv-banner-loc">📍 ${p.ubicacion}</div>
+              ${p.desc ? `<div class="tv-banner-desc">${p.desc}</div>` : ''}
+              ${p.estado === 'under_contract' ? `<div style="display:inline-block;background:#E65100;color:#fff;font-size:0.6rem;font-weight:700;padding:3px 10px;border-radius:3px;letter-spacing:0.1em;margin-bottom:5px">🔶 UNDER CONTRACT</div>` : ''}
+              <div class="tv-banner-specs">${specs.join('')}</div>
+            </div>
+            <div class="tv-qr">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https://urdapilletarealestate.com&color=7BA7D4&bgcolor=00000000" alt="QR" style="width:65px;height:65px;border-radius:5px;padding:2px">
+              <div style="font-size:0.48rem;color:rgba(255,255,255,0.35);text-align:center;margin-top:2px;letter-spacing:0.06em">urdapilletarealestate.com</div>
+            </div>
+          </div>
         </div>
       </div>`;
     }
@@ -1080,8 +1125,8 @@ function renderTVScreen(containerId, propList, tipo) {
 }
 
 function renderPantallas() {
-  const venta = propiedades.filter(p => p.tipo === 'venta' && p.estado === 'activo');
-  const renta = propiedades.filter(p => p.tipo === 'renta' && p.estado === 'activo');
+  const venta = propiedades.filter(p => p.tipo === 'venta' && (p.estado === 'activo' || p.estado === 'under_contract'));
+  const renta = propiedades.filter(p => p.tipo === 'renta' && (p.estado === 'activo' || p.estado === 'under_contract'));
   document.getElementById('screens-grid').innerHTML = `
     <div class="screen-wrapper">
       <div class="screen-label">Pantalla 1 — Logo / Video</div>
@@ -1117,7 +1162,22 @@ function renderPantallas() {
   setTimeout(() => {
     renderTVScreen('tv-venta', venta, 'venta');
     renderTVScreen('tv-renta', renta, 'renta');
+    setTimeout(startPhotoCarousels, 1000);
   }, 100);
+}
+
+function startPhotoCarousels() {
+  document.querySelectorAll('.photo-carousel').forEach(carousel => {
+    const total = parseInt(carousel.dataset.total) || 0;
+    if (total <= 1) return;
+    let cur = 0;
+    setInterval(() => {
+      const slides = carousel.querySelectorAll('.photo-slide');
+      if (slides[cur]) slides[cur].style.opacity = 0;
+      cur = (cur + 1) % total;
+      if (slides[cur]) slides[cur].style.opacity = 1;
+    }, 4000);
+  });
 }
 
 function reiniciarPantallas() {
@@ -1226,6 +1286,15 @@ onValue(dbRef, (snapshot) => {
 });
 
 window._syncOnSave = true;
+
+// Auto-recargar la pagina cada 2 horas para mantener los videos activos
+setInterval(() => {
+  // Solo recargar si estamos en vista de pantallas
+  const pantallasTab = document.getElementById('tab-pantallas');
+  if (pantallasTab && pantallasTab.classList.contains('active')) {
+    location.reload();
+  }
+}, 2 * 60 * 60 * 1000); // 2 horas
 </script>
 
 </body>
