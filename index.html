@@ -764,25 +764,29 @@
         </div>
 
         <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)">
-          <div style="font-size:0.85rem;font-weight:600;margin-bottom:1rem;color:var(--mid)">Videos de pantallas</div>
-          
-          <div style="background:var(--brand-pale);border-radius:8px;padding:1rem;margin-bottom:1rem;border:1px solid var(--border)">
-            <div style="font-size:0.78rem;font-weight:600;color:var(--brand);margin-bottom:0.5rem">📺 Pantalla 1 — Logo / Video</div>
-            <div class="form-group" style="margin-bottom:0.5rem">
-              <label>Link de YouTube</label>
-              <input type="text" id="f-video-tv1" placeholder="https://www.youtube.com/watch?v=...">
-            </div>
-            <button class="btn btn-primary btn-sm" onclick="guardarVideoTV1()">Actualizar Pantalla 1</button>
-          </div>
+          <div style="font-size:0.9rem;font-weight:600;margin-bottom:1rem;color:var(--brand-dark)">📺 Configuración de Pantallas</div>
 
-          <div style="background:var(--brand-pale);border-radius:8px;padding:1rem;border:1px solid var(--border)">
-            <div style="font-size:0.78rem;font-weight:600;color:var(--brand);margin-bottom:0.5rem">📺 Pantalla 4 — Video del equipo</div>
-            <div class="form-group" style="margin-bottom:0.5rem">
-              <label>Link de YouTube</label>
-              <input type="text" id="f-video-url" placeholder="https://www.youtube.com/watch?v=...">
+          ${['tv1','tv2','tv3','tv4'].map((tv, i) => `
+          <div style="background:var(--brand-pale);border-radius:8px;padding:1rem;margin-bottom:0.75rem;border:1px solid var(--border)">
+            <div style="font-size:0.78rem;font-weight:600;color:var(--brand);margin-bottom:0.75rem">Pantalla ${i+1}</div>
+            <div class="form-row" style="margin-bottom:0.5rem">
+              <div class="form-group" style="margin-bottom:0">
+                <label>Contenido</label>
+                <select id="modo-${tv}" onchange="toggleVideoField('${tv}')">
+                  <option value="logo">Logo</option>
+                  <option value="venta">Propiedades en Venta</option>
+                  <option value="renta">Propiedades en Renta</option>
+                  <option value="video">Video de YouTube</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0" id="campo-video-${tv}">
+                <label>Link de YouTube</label>
+                <input type="text" id="video-${tv}" placeholder="https://www.youtube.com/watch?v=...">
+              </div>
             </div>
-            <button class="btn btn-primary btn-sm" onclick="guardarVideo()">Actualizar Pantalla 4</button>
+            <button class="btn btn-primary btn-sm" onclick="guardarTV('${tv}')">Guardar Pantalla ${i+1}</button>
           </div>
+          `).join('')}
         </div>
       </div>
     </div>
@@ -817,6 +821,14 @@ let videoConfig = {
   tv1: "https://www.youtube.com/embed/N9qy3a_HdtQ?autoplay=1&mute=1&loop=1&playlist=N9qy3a_HdtQ&controls=0&modestbranding=1&playsinline=1&rel=0",
   url: "https://www.youtube.com/embed/N9qy3a_HdtQ?autoplay=1&mute=1&loop=1&playlist=N9qy3a_HdtQ&controls=0&modestbranding=1&playsinline=1&rel=0",
   desc: "Conocé a nuestro equipo"
+};
+
+// Configuracion de cada TV: modo y contenido
+let tvConfig = {
+  tv1: { modo: 'video', video: '' },       // logo, video
+  tv2: { modo: 'venta', video: '' },        // venta, renta, video, logo
+  tv3: { modo: 'renta', video: '' },        // venta, renta, video, logo
+  tv4: { modo: 'video', video: '' }         // video, logo
 };
 let nextId = 7;
 let tvPlayers = {};
@@ -970,33 +982,32 @@ function resetForm() {
 
 function convertYouTubeURL(url) {
   if (!url) return '';
-  if (url.includes('youtube.com/watch?v=')) {
-    const id = url.split('v=')[1].split('&')[0];
-    return 'https://www.youtube.com/embed/' + id + '?autoplay=1&mute=1&loop=1&playlist=' + id + '&controls=0&modestbranding=1&playsinline=1&rel=0';
-  } else if (url.includes('youtu.be/')) {
-    const id = url.split('youtu.be/')[1].split('?')[0];
-    return 'https://www.youtube.com/embed/' + id + '?autoplay=1&mute=1&loop=1&playlist=' + id + '&controls=0&modestbranding=1&playsinline=1&rel=0';
-  } else if (url.includes('/embed/')) {
-    const id = url.split('/embed/')[1].split('?')[0];
-    return 'https://www.youtube.com/embed/' + id + '?autoplay=1&mute=1&loop=1&playlist=' + id + '&controls=0&modestbranding=1&playsinline=1&rel=0';
-  }
-  return url;
+  let id = '';
+  if (url.includes('youtube.com/watch?v=')) id = url.split('v=')[1].split('&')[0];
+  else if (url.includes('youtu.be/')) id = url.split('youtu.be/')[1].split('?')[0];
+  else if (url.includes('/embed/')) id = url.split('/embed/')[1].split('?')[0];
+  if (!id) return url;
+  return 'https://www.youtube.com/embed/' + id + '?autoplay=1&mute=1&loop=1&playlist=' + id + '&controls=0&modestbranding=1&playsinline=1&rel=0';
 }
 
-function guardarVideoTV1() {
-  const raw = document.getElementById('f-video-tv1').value.trim();
-  videoConfig.tv1 = raw ? convertYouTubeURL(raw) : '';
-  toast(raw ? '✓ Pantalla 1 — video actualizado' : '✓ Pantalla 1 — mostrando logo');
+function toggleVideoField(tv) {
+  const modo = document.getElementById('modo-' + tv).value;
+  const campo = document.getElementById('campo-video-' + tv);
+  if (campo) campo.style.display = modo === 'video' ? 'block' : 'none';
+}
+
+function guardarTV(tv) {
+  const modo = document.getElementById('modo-' + tv).value;
+  const videoRaw = document.getElementById('video-' + tv) ? document.getElementById('video-' + tv).value.trim() : '';
+  tvConfig[tv] = { modo, video: modo === 'video' ? convertYouTubeURL(videoRaw) : '' };
+  // Also update videoConfig for backward compatibility
+  if (tv === 'tv1') videoConfig.tv1 = tvConfig.tv1.video;
+  if (tv === 'tv4') videoConfig.url = tvConfig.tv4.video;
+  toast('✓ Pantalla ' + tv.replace('tv','') + ' actualizada');
   if(window.syncFirebase) window.syncFirebase();
 }
 
-function guardarVideo() {
-  const raw = document.getElementById('f-video-url').value.trim();
-  if (!raw) { toast('Pegá un link de YouTube'); return; }
-  videoConfig.url = convertYouTubeURL(raw);
-  toast('✓ Pantalla 4 actualizada');
-  if(window.syncFirebase) window.syncFirebase();
-}
+function guardarVideo() {} // kept for compatibility
 
 function buildSlides(propList, tipo) {
   const slides = [{ type: 'intro', tipo }];
@@ -1127,41 +1138,47 @@ function renderTVScreen(containerId, propList, tipo) {
 function renderPantallas() {
   const venta = propiedades.filter(p => p.tipo === 'venta' && (p.estado === 'activo' || p.estado === 'under_contract'));
   const renta = propiedades.filter(p => p.tipo === 'renta' && (p.estado === 'activo' || p.estado === 'under_contract'));
-  document.getElementById('screens-grid').innerHTML = `
-    <div class="screen-wrapper">
-      <div class="screen-label">Pantalla 1 — Logo / Video</div>
-      <div class="tv-screen" style="background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative">
-        ${videoConfig.tv1
-          ? `<iframe src="${videoConfig.tv1}" style="width:100%;height:100%;position:absolute;inset:0;border:none" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"></iframe>`
-          : `<img src="${LOGO_SRC}" alt="Urdapilleta Real Estate" style="width:65%;max-width:320px">`
-        }
-      </div>
-    </div>
-    <div class="screen-wrapper">
-      <div class="screen-label">Pantalla 2 — En venta</div>
-      <div class="tv-screen" id="tv-venta"></div>
-    </div>
-    <div class="screen-wrapper">
-      <div class="screen-label">Pantalla 3 — En renta</div>
-      <div class="tv-screen" id="tv-renta"></div>
-    </div>
-    <div class="screen-wrapper">
-      <div class="screen-label">Pantalla 4 — Equipo</div>
-      <div class="screen-header-bar"></div>
-      <div class="screen-video">
-        ${videoConfig.url
-          ? `<iframe src="${videoConfig.url}" style="width:100%;height:100%;position:absolute;inset:0;border:none" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"></iframe>`
-          : `<img class="video-logo" src="${LOGO_SRC}" alt="">
-             <div class="video-play"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#7BA7D4"/></svg></div>
-             <div class="video-title">Conocé a nuestro equipo</div>
-             <div class="video-sub">Configurá la URL en el panel de admin</div>`
-        }
-      </div>
-    </div>
-  `;
+  function renderScreenContent(tv, num) {
+    const cfg = tvConfig[tv] || { modo: tv === 'tv2' ? 'venta' : tv === 'tv3' ? 'renta' : 'logo', video: '' };
+    const label = `Pantalla ${num}`;
+    if (cfg.modo === 'video' && cfg.video) {
+      return `<div class="screen-wrapper">
+        <div class="screen-label">${label} — Video</div>
+        <div class="tv-screen" style="position:relative">
+          <iframe src="${cfg.video}" style="width:100%;height:100%;position:absolute;inset:0;border:none" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"></iframe>
+        </div>
+      </div>`;
+    } else if (cfg.modo === 'logo' || (cfg.modo === 'video' && !cfg.video)) {
+      return `<div class="screen-wrapper">
+        <div class="screen-label">${label} — Logo</div>
+        <div class="tv-screen" style="background:#fff;display:flex;align-items:center;justify-content:center">
+          <img src="${LOGO_SRC}" alt="Urdapilleta" style="width:65%;max-width:320px">
+        </div>
+      </div>`;
+    } else {
+      return `<div class="screen-wrapper">
+        <div class="screen-label">${label} — ${cfg.modo === 'venta' ? 'En venta' : 'En renta'}</div>
+        <div class="tv-screen" id="tv-screen-${tv}"></div>
+      </div>`;
+    }
+  }
+
+  document.getElementById('screens-grid').innerHTML =
+    renderScreenContent('tv1', 1) +
+    renderScreenContent('tv2', 2) +
+    renderScreenContent('tv3', 3) +
+    renderScreenContent('tv4', 4);
   setTimeout(() => {
-    renderTVScreen('tv-venta', venta, 'venta');
-    renderTVScreen('tv-renta', renta, 'renta');
+    ['tv1','tv2','tv3','tv4'].forEach(tv => {
+      const cfg = tvConfig[tv] || {};
+      if (cfg.modo === 'venta' || cfg.modo === 'renta') {
+        const container = document.getElementById('tv-screen-' + tv);
+        if (container) {
+          const lista = propiedades.filter(p => p.tipo === cfg.modo && (p.estado === 'activo' || p.estado === 'under-contract'));
+          renderTVScreen('tv-screen-' + tv, lista, cfg.modo);
+        }
+      }
+    });
     setTimeout(startPhotoCarousels, 1000);
   }, 100);
 }
@@ -1206,6 +1223,20 @@ function toast(msg) {
 
 renderStats();
 renderTabla();
+// Init TV config form
+setTimeout(() => {
+  ['tv1','tv2','tv3','tv4'].forEach(tv => {
+    const modoEl = document.getElementById('modo-' + tv);
+    const videoEl = document.getElementById('video-' + tv);
+    if (modoEl && tvConfig[tv]) {
+      modoEl.value = tvConfig[tv].modo || 'logo';
+      toggleVideoField(tv);
+    }
+    if (videoEl && tvConfig[tv] && tvConfig[tv].video) {
+      videoEl.value = tvConfig[tv].video;
+    }
+  });
+}, 600);
 // Mostrar URLs actuales en los campos de video
 setTimeout(() => {
   const tv1Input = document.getElementById('f-video-tv1');
@@ -1240,6 +1271,7 @@ window.syncFirebase = function() {
   set(dbRef, {
     propiedades: propiedades,
     videoConfig: videoConfig,
+    tvConfig: tvConfig,
     lastUpdate: lastSyncTime
   }).catch(err => console.error('Firebase error:', err));
 }
